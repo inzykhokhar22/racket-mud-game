@@ -34,11 +34,11 @@
 
 ;; code to keep items in pockets
 
-;; items in the world
+;; items in the room
 (define objectdb (make-hash))
 ;; items in the possesion
 (define inventorydb (make-hash))
-;; function to add item to hash table
+;; function to add an item to hash table
 (define (add-object db id object)
   (if (hash-has-key? db id)
       (let ((record (hash-ref db id)))
@@ -49,8 +49,47 @@
   (for-each
    (lambda (r)
      (add-object db (first r) (second r))) objects))
-;; put all items from objects list to objectdb (the database of all items in the world)
+;; put all items from objects list to objectdb (the database of all items in the room)
 (add-objects objectdb)
+
+;; remove an item from a room
+;; you can't just remove an item to nowhere, so add it to invevtory
+(define (remove-object-from-room db id str)
+  (when (hash-has-key? db id)
+    (let* ((record (hash-ref db id))
+           (result (remove (lambda (x) (string-suffix-ci? str x)) record))
+           (item (lset-difference equal? record result)))
+      (cond ((null? item)
+             (printf " I don’t see that item in the room!\n"))
+            (else
+             (printf " Added ~ a to your bag .\n" (first item))
+             (add-object inventorydb 'bag (first item))
+             (hash-set! db id result ))))))
+
+;; remove an item from inventory and put it to a room
+(define (remove-object-from-inventory db id str)
+  (when (hash-has-key? db 'bag)
+    (let* ((record (hash-ref db 'bag))
+           (result (remove (lambda (x) (string-suffix-ci? str x)) record))
+           (item (lset-difference equal? record result)))
+      (cond ((null? item)
+             (printf " You are not carrying that item!\n"))
+            (else
+             (printf " Removed ~ a from your bag.\n" (first item))
+             (add-object objectdb id (first item))
+             (hash-set! db 'bag result))))))
+
+;; display objects in db (either room or inventory)
+(define (display-objects db id)
+   (when (hash-has-key? db id)
+      (let* ((record (hash-ref db id))
+               (output (string-join record " and ")))
+         (when (not (equal? output " "))
+            (if (eq? id 'bag )
+                 (printf " You are carrying ~a.\n " output)
+                 (printf " You can see ~a.\n " output))))))
+
+
 
 (define (slist->string l)
   (string-join (map symbol->string l)))
