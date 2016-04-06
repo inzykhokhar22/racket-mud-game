@@ -89,7 +89,17 @@
                  (printf " You are carrying ~a.\n " output)
                  (printf " You can see ~a.\n " output))))))
 
-
+;; pick up an item
+(define (pick-item id input)
+   (let (( item ( string-join (cdr (string-split input)))))
+      (remove-object-from-room objectdb id item)))
+;; drop an item
+(define (put-item id input)
+   (let ((item ( string-join (cdr (string-split input)))))
+      (remove-object-from-inventory inventorydb id item)))
+;; display what do we have in posession
+(define (display-inventory)
+   (display-objects inventorydb 'bag))
 
 (define (slist->string l)
   (string-join (map symbol->string l)))
