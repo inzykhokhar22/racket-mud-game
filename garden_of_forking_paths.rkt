@@ -86,8 +86,8 @@
                (output (string-join record " and ")))
          (when (not (equal? output " "))
             (if (eq? id 'bag )
-                 (printf "You are carrying ~a.\n " output)
-                 (printf "You can see ~a.\n " output))))))
+                 (printf "You are carrying ~a.\n" output)
+                 (printf "You can see ~a.\n" output))))))
 
 ;; pick up an item
 (define (pick-item id input)
@@ -173,6 +173,12 @@
                (loop id #f))
               ((eq? response 'look)
                (get-directions id)
+               (loop id #t))
+              ((eq? response 'pick)
+               (pick-item id input)
+               (loop id #f))
+              ((eq? response 'put)
+               (put-item id input)
                (loop id #f))
               ((eq? response 'inventory)
                (display-inventory)
