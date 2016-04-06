@@ -7,18 +7,22 @@
 (define descriptions '((1 "You are at the trainstation")
                        (2 "You are on the road")
                        (3 "You are on the road")
-                       (4 "You are before old gates")
-                       (5 "You are in the garden")
-                       (6 "You are in the house")))
+                       (4 "You are on the road")
+                       (5 "You are before old gates")
+                       (6 "You are in the garden")
+                       (7 "You are in the house")))
 
 (define look '(((directions) look) ((look) look) ((examine room) look)))
 (define quit '(((exit game) quit) ((quit game) quit) ((exit) quit) ((quit) quit)))
 (define actions `(,@look ,@quit))
 
 (define decisiontable `((1 ((road) 2) ,@actions)
-                        (2 ((left) 3) ((right) 2) ((station) 1) ,@actions)
+                        (2 ((left) 3) ((right) 3) ((station) 1) ,@actions)
                         (3 ((left) 4) ((right) 3) ((back) 2) ,@actions)
-                        (4 ,@actions)))
+                        (4 ((left) 5) ((right) 4) ((back) 3) ,@actions)
+                        (5 ((enter) 6) ((back) 4) ,@actions)
+                        (6 ((house) 7) ((out) 5) ,@actions)
+                        (7 ((out) 6) ,@actions)))
 
 
 (define (slist->string l)
