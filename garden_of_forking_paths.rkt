@@ -3,16 +3,16 @@
 (require srfi/13)
 (require srfi/48)
 
-(define objects '((1 " a silver dagger ")
-                   (1 " a gold coin ")))
+(define objects '((1 "a silver dagger")
+                   (1 "a gold coin")))
 ;; world map
-(define descriptions '((1 "You are at the trainstation")
-                       (2 "You are on the road")
-                       (3 "You are on the road")
-                       (4 "You are on the road")
-                       (5 "You are before old gates")
-                       (6 "You are in the garden")
-                       (7 "You are in the house")))
+(define descriptions '((1 "You are at the trainstation.")
+                       (2 "You are on the road.")
+                       (3 "You are on the road.")
+                       (4 "You are on the road.")
+                       (5 "You are before old gates.")
+                       (6 "You are in the garden.")
+                       (7 "You are in the house.")))
 
 ;; define actions that are possible in rooms
 (define look '(((directions) look) ((look) look) ((examine room) look)))
@@ -60,9 +60,9 @@
            (result (remove (lambda (x) (string-suffix-ci? str x)) record))
            (item (lset-difference equal? record result)))
       (cond ((null? item)
-             (printf " I don’t see that item in the room!\n"))
+             (printf "I don’t see that item in the room!\n"))
             (else
-             (printf " Added ~ a to your bag .\n" (first item))
+             (printf "Added ~a to your bag.\n" (first item))
              (add-object inventorydb 'bag (first item))
              (hash-set! db id result ))))))
 
@@ -73,9 +73,9 @@
            (result (remove (lambda (x) (string-suffix-ci? str x)) record))
            (item (lset-difference equal? record result)))
       (cond ((null? item)
-             (printf " You are not carrying that item!\n"))
+             (printf "You are not carrying that item!\n"))
             (else
-             (printf " Removed ~ a from your bag.\n" (first item))
+             (printf "Removed ~a from your bag.\n" (first item))
              (add-object objectdb id (first item))
              (hash-set! db 'bag result))))))
 
@@ -86,8 +86,8 @@
                (output (string-join record " and ")))
          (when (not (equal? output " "))
             (if (eq? id 'bag )
-                 (printf " You are carrying ~a.\n " output)
-                 (printf " You can see ~a.\n " output))))))
+                 (printf "You are carrying ~a.\n " output)
+                 (printf "You can see ~a.\n " output))))))
 
 ;; pick up an item
 (define (pick-item id input)
@@ -158,9 +158,10 @@
 
 (define (startgame initial-id)
   (let loop ((id initial-id) (description #t))
-    (if description
-        (printf "~a\n> " (get-response id))
-        (printf "> "))
+    (when description
+      (printf "~a\n" (get-response id)) 
+      (display-objects objectdb id))
+    (printf "> ")
     (let* ((input (read-line))
            (string-tokens (string-tokenize input))
            (tokens (map string->symbol string-tokens)))
@@ -172,6 +173,9 @@
                (loop id #f))
               ((eq? response 'look)
                (get-directions id)
+               (loop id #f))
+              ((eq? response 'inventory)
+               (display-inventory)
                (loop id #f))
               ((eq? response 'quit)
                (format #t "So Long, and Thanks for All the Fish...\n")
