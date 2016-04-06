@@ -3,6 +3,8 @@
 (require srfi/13)
 (require srfi/48)
 
+(define objects '((1 " a silver dagger ")
+                   (1 " a gold coin ")))
 
 (define descriptions '((1 "You are at the trainstation")
                        (2 "You are on the road")
@@ -14,7 +16,10 @@
 
 (define look '(((directions) look) ((look) look) ((examine room) look)))
 (define quit '(((exit game) quit) ((quit game) quit) ((exit) quit) ((quit) quit)))
-(define actions `(,@look ,@quit))
+(define pick '(((get) pick) ((pickup) pick) ((pick) pick)))
+(define put '(((put) drop) ((drop) drop) ((place) drop) ((remove) drop )))
+(define inventory '(((inventory) inventory) ((bag) inventory)))
+(define actions `(,@look ,@pick ,@put ,@inventory ,@quit))
 
 (define decisiontable `((1 ((road) 2) ,@actions)
                         (2 ((left) 3) ((right) 3) ((station) 1) ,@actions)
