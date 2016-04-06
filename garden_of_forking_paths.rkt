@@ -5,7 +5,7 @@
 
 (define objects '((1 " a silver dagger ")
                    (1 " a gold coin ")))
-
+;; world map
 (define descriptions '((1 "You are at the trainstation")
                        (2 "You are on the road")
                        (3 "You are on the road")
@@ -14,13 +14,16 @@
                        (6 "You are in the garden")
                        (7 "You are in the house")))
 
+;; define actions that are possible in rooms
 (define look '(((directions) look) ((look) look) ((examine room) look)))
-(define quit '(((exit game) quit) ((quit game) quit) ((exit) quit) ((quit) quit)))
 (define pick '(((get) pick) ((pickup) pick) ((pick) pick)))
 (define put '(((put) drop) ((drop) drop) ((place) drop) ((remove) drop )))
 (define inventory '(((inventory) inventory) ((bag) inventory)))
+(define quit '(((exit game) quit) ((quit game) quit) ((exit) quit) ((quit) quit)))
 (define actions `(,@look ,@pick ,@put ,@inventory ,@quit))
 
+;; directions map
+;; note some paths are made infinite by reason
 (define decisiontable `((1 ((road) 2) ,@actions)
                         (2 ((left) 3) ((right) 3) ((station) 1) ,@actions)
                         (3 ((left) 4) ((right) 3) ((back) 2) ,@actions)
@@ -29,6 +32,25 @@
                         (6 ((house) 7) ((out) 5) ,@actions)
                         (7 ((out) 6) ,@actions)))
 
+;; code to keep items in pockets
+
+;; items in the world
+(define objectdb (make-hash))
+;; items in the possesion
+(define inventorydb (make-hash))
+;; function to add item to hash table
+(define (add-object db id object)
+  (if (hash-has-key? db id)
+      (let ((record (hash-ref db id)))
+        (hash-set! db id (cons object record)))
+      (hash-set! db id (cons object empty))))
+;; function to add all items from objects list to hash table
+(define (add-objects db)
+  (for-each
+   (lambda (r)
+     (add-object db (first r) (second r))) objects))
+;; put all items from objects list to objectdb (the database of all items in the world)
+(add-objects objectdb)
 
 (define (slist->string l)
   (string-join (map symbol->string l)))
